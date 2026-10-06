@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二十四節氣與台灣當季物產</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      padding: 20px; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", serif; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background 0.6s ease;
+    }
+    
+    body.season-spring { background-color: #f7f4ed; }
+    .card.season-spring { background: rgba(253, 251, 247, 0.92); backdrop-filter: blur(10px); border: 1px solid #e8d5c4; }
+    .season-spring .highlight { color: #b83264; font-weight: bold; }
+    .season-spring .tag-title { color: #822245; }
+
+    body.season-summer { background-color: #f4f6f0; }
+    .card.season-summer { background: rgba(253, 251, 247, 0.92); backdrop-filter: blur(10px); border: 1px solid #cfdcd3; }
+    .season-summer .highlight { color: #2d7a4c; font-weight: bold; }
+    .season-summer .tag-title { color: #1e5233; }
+
+    body.season-autumn { background-color: #f7f3eb; }
+    .card.season-autumn { background: rgba(253, 251, 247, 0.92); backdrop-filter: blur(10px); border: 1px solid #ebd9c3; }
+    .season-autumn .highlight { color: #b45309; font-weight: bold; }
+    .season-autumn .tag-title { color: #78350f; }
+
+    body.season-winter { background-color: #f1f4f7; }
+    .card.season-winter { background: rgba(253, 251, 247, 0.92); backdrop-filter: blur(10px); border: 1px solid #d1dbe5; }
+    .season-winter .highlight { color: #0369a1; font-weight: bold; }
+    .season-winter .tag-title { color: #0f4c81; }
+
+    .card { max-width: 360px; width: 100%; border-radius: 20px; padding: 20px; box-shadow: 0 12px 32px rgba(40, 30, 20, 0.08); color: #2c2a29; transition: all 0.3s ease; }
+    .header { font-size: 12px; color: #6e6a66; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .countdown-badge { 
+      background: rgba(247, 244, 237, 0.9); 
+      padding: 3px 9px; 
+      border-radius: 12px; 
+      font-size: 11px; 
+      font-weight: 600; 
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .title-container { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(60, 50, 40, 0.1); }
+    .term-title { font-size: 28px; font-weight: bold; color: #1a1918; margin-bottom: 2px; letter-spacing: 2px; }
+    .season-title { font-size: 22px; font-weight: bold; text-align: right; }
+    
+    .season-terms { font-size: 11px; color: #6e6a66; margin-top: 6px; text-align: right; line-height: 1.8; max-width: 160px; }
+    .term-btn { 
+      cursor: pointer; 
+      display: inline-block; 
+      padding: 1px 5px; 
+      margin: 1px; 
+      border-radius: 4px; 
+      transition: all 0.2s; 
+      user-select: none;
+    }
+    .term-btn:hover { background: rgba(0,0,0,0.05); }
+    .term-btn.active { font-weight: bold; text-decoration: underline; }
+    .term-btn.is-today::after { content: '•'; margin-left: 2px; font-weight: bold; }
+
+    .box { margin-top: 12px; background: rgba(255, 253, 249, 0.7); padding: 12px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
+    .box-title { font-size: 12px; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
+    .box-desc { font-size: 12px; color: #4a4643; line-height: 1.6; }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .grid-box { background: rgba(255, 253, 249, 0.7); padding: 10px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
+    .grid-title { font-size: 12px; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
+    .grid-desc { font-size: 11px; color: #4a4643; line-height: 1.5; }
+    .prod-box { margin-top: 12px; background: rgba(255, 253, 249, 0.85); padding: 12px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
+    .poem-text { font-style: italic; color: #383431; font-family: "KaiTi", "BiauKai", serif; }
+  </style>
+</head>
+<body>
+  <div class="card" id="app"></div>
+
+  <script>
+    const SOLAR_TERMS = [
+      { name: '小寒', english: 'Minor Cold', season: '冬', month: 1, day: 5, 
+        meaning: '冷氣積久而寒，進入一年中最冷的時節之一。',
+        climate: '寒潮頻繁，為一年中最冷時節之一。', 
+        poems: ['小寒連大寒，感冒防風寒。'],
+        diet: '宜溫補去寒，多食羊肉、桂圓、糯米。', fruits: '柑橘、蓮霧', veg: '大白菜、蘿蔔' },
+      { name: '大寒', english: 'Major Cold', season: '冬', month: 1, day: 20, 
+        meaning: '一年中最嚴寒的時期，也是二十四節氣的最後一個。',
+        climate: '極寒時期，積雪不化，寒風刺骨。', 
+        poems: ['大寒宜近火，無事莫開門。'],
+        diet: '進補好時機，宜養腎防寒。', fruits: '桶柑、蜜棗', veg: '菠菜、花椰菜' },
+      { name: '立春', english: 'Beginning of Spring', season: '春', month: 2, day: 4, 
+        meaning: '象徵春季開啟，萬物甦醒。',
+        climate: '春回大地，氣溫回升但仍有冷空氣。', 
+        poems: ['國破山河在，城春草木深。'],
+        diet: '宜辛溫升發。', fruits: '草莓、枇杷', veg: '春筍、韭菜' },
+      { name: '雨水', english: 'Rain Water', season: '春', month: 2, day: 19, 
+        meaning: '代表降雨開始增多。',
+        climate: '降雨漸增，氣溫起伏大，濕氣增加。', 
+        poems: ['好雨知時節，當春乃發生。'],
+        diet: '健脾祛濕。', fruits: '蓮霧、鳳梨', veg: '茼蒿、菠菜' },
+      { name: '驚蟄', english: 'Awakening of Insects', season: '春', month: 3, day: 6, 
+        meaning: '指春雷初響驚醒冬眠昆蟲。',
+        climate: '春雷初響，萬物甦醒，氣溫轉暖。', 
+        poems: ['微雨眾卉新，一雷驚植物。'],
+        diet: '宜順應春氣。', fruits: '枇杷、鳳梨', veg: '韭菜、蘆筍' },
+      { name: '春分', english: 'Spring Equinox', season: '春', month: 3, day: 21, 
+        meaning: '太陽直射赤道，晝夜等長。',
+        climate: '晝夜等長，氣溫適中，偶有春雨。', 
+        poems: ['日月陽陰兩均天。'],
+        diet: '飲食宜平衡。', fruits: '枇杷、芭樂', veg: '萵苣、莧菜' },
+      { name: '清明', english: 'Clear and Bright', season: '春', month: 4, day: 5, 
+        meaning: '氣候溫暖，草木萌發顯得清澈明潔。',
+        climate: '氣候溫和，草木萌發，多細雨。', 
+        poems: ['清明時節雨紛紛。'],
+        diet: '宜清淡飲食。', fruits: '桑椹、香蕉', veg: '桂竹筍、胡蘿蔔' },
+      { name: '穀雨', english: 'Grain Rain', season: '春', month: 4, day: 20, 
+        meaning: '雨水滋養百穀成長。',
+        climate: '降雨量明顯增加，有利於穀物生長。', 
+        poems: ['谷雨春光曉，山川黛色青。'],
+        diet: '祛濕健脾。', fruits: '西瓜、鳳梨', veg: '竹筍、絲瓜' },
+      { name: '立夏', english: 'Beginning of Summer', season: '夏', month: 5, day: 5, 
+        meaning: '代表夏季開始，萬物成長茁壯。',
+        climate: '進入夏季，氣溫漸高，午後偶有雷雨。', 
+        poems: ['綠樹陰濃夏日長。'],
+        diet: '宜清心瀉火。', fruits: '芒果、西瓜', veg: '苦瓜、小黃瓜' },
+      { name: '小滿', english: 'Grain Buds', season: '夏', month: 5, day: 21, 
+        meaning: '麥類等夏熟作物籽粒開始飽滿。',
+        climate: '夏熟作物籽粒開始飽滿，氣候悶熱。', 
+        poems: ['最愛壟頭麥。'],
+        diet: '多食清熱利濕之物。', fruits: '荔枝、西瓜', veg: '絲瓜、冬瓜' },
+      { name: '芒種', english: 'Grain in Ear', season: '夏', month: 6, day: 6, 
+        meaning: '有芒芒的穀物適宜播種，亦是繁忙播種季。',
+        climate: '梅雨季結束，氣溫飆高，氣候濕熱。', 
+        poems: ['芒種忙忙割。'],
+        diet: '補充水分。', fruits: '葡萄、西瓜', veg: '竹筍、苦瓜' },
+      { name: '夏至', english: 'Summer Solstice', season: '夏', month: 6, day: 21, 
+        meaning: '太陽直射北回歸線，白晝最長。',
+        climate: '白晝最長，高溫炎熱，午後雷陣雨。', 
+        poems: ['漠漠水田飛白鷺。'],
+        diet: '清淡解暑。', fruits: '鳳梨、西瓜', veg: '空心菜、小黃瓜' },
+      { name: '小暑', english: 'Minor Heat', season: '夏', month: 7, day: 7, 
+        meaning: '天氣開始進入炎熱時期。',
+        climate: '天氣開始極度炎熱，進入伏天。', 
+        poems: ['竹深樹密蟲鳴處。'],
+        diet: '多食清熱解毒食物。', fruits: '芒果、葡萄', veg: '苦瓜、冬瓜' },
+      { name: '大暑', english: 'Major Heat', season: '夏', month: 7, day: 23, 
+        meaning: '為一年之中陽氣最盛、氣溫最高的時期。',
+        climate: '一年中最熱的時期，陽光烈日高照。', 
+        poems: ['赤日幾時過。'],
+        diet: '吃苦嘗酸。', fruits: '水蜜桃、水梨', veg: '竹筍、茄子' },
+      { name: '立秋', english: 'Beginning of Autumn', season: '秋', month: 8, day: 7, 
+        meaning: '代表秋季來臨，草木開始結果收斂。',
+        climate: '秋季開始，但暑氣未退。', 
+        poems: ['睡起秋聲無覓處。'],
+        diet: '少辛多酸。', fruits: '龍眼、水梨', veg: '蓮藕、絲瓜' },
+      { name: '處暑', english: 'Limit of Heat', season: '秋', month: 8, day: 23, 
+        meaning: '表示炎熱暑氣至此結束。',
+        climate: '暑氣至此結束，早晚溫差逐漸加大。', 
+        poems: ['處暑無三日。'],
+        diet: '滋陰潤燥。', fruits: '文旦柚、火龍果', veg: '茭白筍、麻竹筍' },
+      { name: '白露', english: 'White Dew', season: '秋', month: 9, day: 7, 
+        meaning: '夜間水氣凝結為白色露珠。',
+        climate: '水氣凝結成露，夜間涼意明顯。', 
+        poems: ['露從今夜白。'],
+        diet: '潤肺防燥。', fruits: '文旦、百香果', veg: '茭白筍、茄子' },
+      { name: '秋分', english: 'Autumn Equinox', season: '秋', month: 9, day: 23, 
+        meaning: '太陽再次直射赤道，秋季過半，晝夜再次平分。',
+        climate: '晝夜平分，氣溫持續下降。', 
+        poems: ['金氣秋分夜。'],
+        diet: '平衡陰陽。', fruits: '甜柿、釋迦', veg: '山藥、芋頭' },
+      { name: '寒露', english: 'Cold Dew', season: '秋', month: 10, day: 8, 
+        meaning: '氣溫更低，地面的露水寒冷將凝結成霜。',
+        climate: '露水寒冷將凝結，東北季風增強。', 
+        poems: ['寒露驚秋晚。'],
+        diet: '滋陰防燥。', fruits: '柿子、木瓜', veg: '芋頭、牛蒡' },
+      { name: '霜降', english: 'Frost Descent', season: '秋', month: 10, day: 23, 
+        meaning: '天氣漸冷，黃河流域開始降霜，代表深秋結束。',
+        climate: '深秋氣溫驟降。', 
+        poems: ['停車坐愛楓林晚。'],
+        diet: '補冬不如補霜降。', fruits: '柿子、蜜棗', veg: '蓮藕、山藥' },
+      { name: '立冬', english: 'Beginning of Winter', season: '冬', month: 11, day: 7, 
+        meaning: '代表冬季開始，作物收割藏納。',
+        climate: '冬季開始，氣溫顯著下降。', 
+        poems: ['北風往複幾時休。'],
+        diet: '補冬養生。', fruits: '柑橘、柳丁', veg: '蘿蔔、菠菜' },
+      { name: '小雪', english: 'Minor Snow', season: '冬', month: 11, day: 22, 
+        meaning: '氣溫漸低，開始降雪但雪量尚小。',
+        climate: '氣溫持續走低。', 
+        poems: ['晚來天欲雪。'],
+        diet: '溫補養腎。', fruits: '柑橘、蓮霧', veg: '高麗菜、大白菜' },
+      { name: '大雪', english: 'Major Snow', season: '冬', month: 12, day: 7, 
+        meaning: '黃河流域積雪範圍增大，天氣更加寒冷。',
+        climate: '寒氣逼人，氣溫低迷。', 
+        poems: ['千山鳥飛絕。'],
+        diet: '溫熱補益。', fruits: '橘子、草莓', veg: '蘿蔔、花椰菜' },
+      { name: '冬至', english: 'Winter Solstice', season: '冬', month: 12, day: 22, 
+        meaning: '太陽直射南回歸線，北半球白晝最短、夜最長。',
+        climate: '夜最長日最短。', 
+        poems: ['天時人事日相催。'],
+        diet: '吃湯圓象徵團圓。', fruits: '蜜棗、蓮霧', veg: '芥菜、蘿蔔' }
+    ];
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const m = today.getMonth() + 1;
+    const d = today.getDate();
+    const todayTimestamp = new Date(currentYear, today.getMonth(), d).getTime();
+
+    let todayTermIndex = -1;
+    let nextTermIndex = -1;
+    let daysToNextTerm = 0;
+
+    for (let i = SOLAR_TERMS.length - 1; i >= 0; i--) {
+      const termDate = new Date(currentYear, SOLAR_TERMS[i].month - 1, SOLAR_TERMS[i].day).getTime();
+      if (todayTimestamp >= termDate) {
+        todayTermIndex = i;
+        break;
+      }
+    }
+
+    if (todayTermIndex === -1) {
+      todayTermIndex = SOLAR_TERMS.findIndex(t => t.name === '冬至');
+      nextTermIndex = SOLAR_TERMS.findIndex(t => t.name === '小寒');
+      const nextDate = new Date(currentYear, 0, 5).getTime();
+      daysToNextTerm = Math.ceil((nextDate - todayTimestamp) / (1000 * 60 * 60 * 24));
+    } else {
+      nextTermIndex = (todayTermIndex + 1) % SOLAR_TERMS.length;
+      let nextYear = currentYear;
+      if (nextTermIndex === 0) nextYear += 1;
+      
+      const nextTermObj = SOLAR_TERMS[nextTermIndex];
+      const nextDate = new Date(nextYear, nextTermObj.month - 1, nextTermObj.day).getTime();
+      daysToNextTerm = Math.ceil((nextDate - todayTimestamp) / (1000 * 60 * 60 * 24));
+    }
+
+    const todayTerm = SOLAR_TERMS[todayTermIndex];
+    const nextTerm = SOLAR_TERMS[nextTermIndex];
+    let selectedTerm = todayTerm;
+
+    function render() {
+      let seasonClass = 'season-spring';
+      if (selectedTerm.season === '夏') seasonClass = 'season-summer';
+      if (selectedTerm.season === '秋') seasonClass = 'season-autumn';
+      if (selectedTerm.season === '冬') seasonClass = 'season-winter';
+
+      document.body.className = seasonClass;
+
+      const seasonTerms = SOLAR_TERMS.filter(t => t.season === selectedTerm.season);
+      const seasonTermsHTML = seasonTerms.map(t => {
+        const isSelected = t.name === selectedTerm.name;
+        const isToday = t.name === todayTerm.name;
+        let classes = 'term-btn';
+        if (isSelected) classes += ' active highlight';
+        if (isToday) classes += ' is-today';
+        
+        return `<span class="${classes}" data-term="${t.name}">${t.name}</span>`;
+      }).join(' ');
+
+      const randomPoem = selectedTerm.poems[Math.floor(Math.random() * selectedTerm.poems.length)];
+
+      const appEl = document.getElementById('app');
+      appEl.className = `card ${seasonClass}`;
+      appEl.innerHTML = `
+        <div class="header">
+          <span>${currentYear} 年 ${m} 月 ${d} 日</span>
+          <span class="countdown-badge tag-title">距 ${nextTerm.name} 還有 ${daysToNextTerm} 天</span>
+        </div>
+        
+        <div class="title-container">
+          <div>
+            <div class="term-title">${selectedTerm.name}</div>
+            <div style="font-size:12px;color:#6e6a66;">${selectedTerm.english}</div>
+          </div>
+          <div>
+            <div class="season-title tag-title">${selectedTerm.season}</div>
+            <div class="season-terms" id="season-terms-container">${seasonTermsHTML}</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title tag-title">節氣釋義</div>
+          <div class="box-desc">${selectedTerm.meaning}</div>
+        </div>
+
+        <div class="box">
+          <div class="box-title tag-title">氣候特徵</div>
+          <div class="box-desc">${selectedTerm.climate}</div>
+        </div>
+
+        <div class="grid">
+          <div class="grid-box">
+            <div class="grid-title tag-title">節氣詩詞</div>
+            <div class="grid-desc poem-text">「${randomPoem}」</div>
+          </div>
+          <div class="grid-box">
+            <div class="grid-title tag-title">飲食養生</div>
+            <div class="grid-desc">${selectedTerm.diet}</div>
+          </div>
+        </div>
+
+        <div class="prod-box">
+          <div style="font-size:12px;font-weight:bold;color:#1a1918;margin-bottom:6px;">台灣當季盛產 (${m}月)</div>
+          <div style="font-size:11px;color:#4a4643;margin-bottom:3px;"><strong class="tag-title">水果：</strong>${selectedTerm.fruits}</div>
+          <div style="font-size:11px;color:#4a4643;"><strong class="tag-title">蔬菜：</strong>${selectedTerm.veg}</div>
+        </div>
+      `;
+
+      const termsContainer = document.getElementById('season-terms-container');
+      termsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.term-btn');
+        if (btn) {
+          const termName = btn.getAttribute('data-term');
+          const foundTerm = SOLAR_TERMS.find(t => t.name === termName);
+          if (foundTerm && foundTerm.name !== selectedTerm.name) {
+            selectedTerm = foundTerm;
+            render();
+          }
+        }
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
