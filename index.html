@@ -9,14 +9,17 @@
     body { 
       margin: 0; 
       padding: 20px; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", serif; 
+      font-family: "Noto Serif TC", "Songti TC", "PMingLiU", "STSong", serif; 
       display: flex; 
       justify-content: center; 
       align-items: center; 
       min-height: 100vh;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-color: #eee6d8;
+      background-image:
+        radial-gradient(circle at 18% 20%, rgba(255,255,255,.55) 0 2px, transparent 3px),
+        radial-gradient(circle at 78% 72%, rgba(91,68,45,.08) 0 1px, transparent 2px),
+        linear-gradient(135deg, rgba(255,255,255,.22), transparent 35%, rgba(95,72,48,.08) 100%);
+      background-size: 110px 110px, 150px 150px, 100% 100%;
       transition: background 0.6s ease;
     }
     
@@ -40,7 +43,33 @@
     .season-winter .highlight { color: #0369a1; font-weight: bold; }
     .season-winter .tag-title { color: #0f4c81; }
 
-    .card { max-width: 360px; width: 100%; border-radius: 20px; padding: 20px; box-shadow: 0 12px 32px rgba(40, 30, 20, 0.08); color: #2c2a29; transition: all 0.3s ease; }
+    .card { 
+      max-width: 360px; 
+      width: 100%; 
+      border-radius: 4px; 
+      padding: 22px; 
+      box-shadow: 0 18px 45px rgba(58, 43, 29, 0.16); 
+      color: #2c2a29; 
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(126, 93, 55, 0.22);
+      pointer-events: none;
+    }
+    .card::after {
+      content: "☯";
+      position: absolute;
+      right: 18px;
+      bottom: 8px;
+      font-size: 34px;
+      color: rgba(93, 67, 43, 0.07);
+      pointer-events: none;
+    }
     .header { font-size: 12px; color: #6e6a66; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     
     .countdown-badge { 
@@ -54,7 +83,7 @@
     }
 
     .title-container { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(60, 50, 40, 0.1); }
-    .term-title { font-size: 28px; font-weight: bold; color: #1a1918; margin-bottom: 2px; letter-spacing: 2px; }
+    .term-title { font-size: 30px; font-weight: bold; color: #29231d; margin-bottom: 2px; letter-spacing: 5px; font-family: "Noto Serif TC", "Songti TC", serif; }
     .season-title { font-size: 22px; font-weight: bold; text-align: right; }
     
     .season-terms { font-size: 11px; color: #6e6a66; margin-top: 6px; text-align: right; line-height: 1.8; max-width: 160px; }
@@ -71,16 +100,16 @@
     .term-btn.active { font-weight: bold; text-decoration: underline; }
     .term-btn.is-today::after { content: '•'; margin-left: 2px; font-weight: bold; }
 
-    .box { margin-top: 12px; background: rgba(255, 253, 249, 0.7); padding: 12px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
+    .box { margin-top: 12px; background: rgba(255, 251, 241, 0.62); padding: 12px; border-radius: 2px; border: 1px solid rgba(126, 93, 55, 0.12); }
     .box-title { font-size: 12px; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
     .box-desc { font-size: 12px; color: #4a4643; line-height: 1.6; }
     
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-    .grid-box { background: rgba(255, 253, 249, 0.7); padding: 10px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
+    .grid-box { background: rgba(255, 251, 241, 0.62); padding: 10px; border-radius: 2px; border: 1px solid rgba(126, 93, 55, 0.12); }
     .grid-title { font-size: 12px; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
     .grid-desc { font-size: 11px; color: #4a4643; line-height: 1.5; }
-    .prod-box { margin-top: 12px; background: rgba(255, 253, 249, 0.85); padding: 12px; border-radius: 12px; border: 1px solid rgba(60, 50, 40, 0.05); }
-    .poem-text { font-style: italic; color: #383431; font-family: "KaiTi", "BiauKai", serif; }
+    .prod-box { margin-top: 12px; background: rgba(255, 251, 241, 0.78); padding: 12px; border-radius: 2px; border: 1px solid rgba(126, 93, 55, 0.12); }
+    .poem-text { font-style: italic; color: #383431; font-family: "KaiTi", "BiauKai", "STKaiti", serif; }
   </style>
 </head>
 <body>
